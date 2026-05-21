@@ -1,0 +1,16 @@
+
+███╗   ███╗ ██████╗ ████████╗████████╗
+████╗ ████║██╔═══██╗╚══██╔══╝╚══██╔══╝
+██╔████╔██║██║   ██║   ██║      ██║
+██║╚██╔╝██║██║▄▄ ██║   ██║      ██║
+██║ ╚═╝ ██║╚██████╔╝   ██║      ██║
+╚═╝     ╚═╝ ╚══▀▀═╝    ╚═╝      ╚═╝
+╔═══════════════════════════════════════════════════════════════╗
+║               MESSAGE QUEUE TELEMETRY TRANSPORT               ║
+║                                                               ║
+║  Spring Boot MQTT Listener Initialized                        ║
+║  Real-time Messaging • IoT • ESP32 • Sensors                  ║
+║  Java ${java.version} ${java.vendor}                               ║
+║  Spring Boot ${spring-boot.version}                                            ║
+║  OS ${os.name} (${os.arch})                                        ║
+╚═══════════════════════════════════════════════════════════════╝

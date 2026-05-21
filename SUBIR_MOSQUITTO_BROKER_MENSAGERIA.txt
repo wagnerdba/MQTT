@@ -1,0 +1,14 @@
+docker run -d --name mosquitto -p 1883:1883 eclipse-mosquitto
+
+docker logs -f mosquitto
+
+No mosquitto.conf (container)
+
+log_type all
+connection_messages true
+log_timestamp true
+
+e no docker
+
+docker exec -it mosquitto sh
+mosquitto_sub -h localhost -t "#" -v
