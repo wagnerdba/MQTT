@@ -12,71 +12,46 @@ import java.sql.Timestamp;
 @Service
 public class SensorDataService {
 
-	private final SensorDataRepository repository;
+    private final SensorDataRepository repository;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public SensorDataService(SensorDataRepository repository) {
-		this.repository = repository;
-	}
+    public SensorDataService(SensorDataRepository repository) {
+        this.repository = repository;
+    }
 
-	public void processMessage(String payload) {
+    public void processMessage(String payload) {
 
-		try {
+        try {
 
-			JsonNode json = objectMapper.readTree(payload);
+            JsonNode json = objectMapper.readTree(payload);
 
-			SensorDataDTO dto = new SensorDataDTO();
+            SensorDataDTO dto = new SensorDataDTO();
 
-			dto.setTemperaturaCelsius(
-					json.get("temperatura_celsius").asDouble()
-			);
+            dto.setTemperaturaCelsius(json.get("temperatura_celsius").asDouble());
+            dto.setTemperaturaFahrenheit(json.get("temperatura_fahrenheit").asDouble());
+            dto.setUmidade(json.get("umidade").asDouble());
+            dto.setDataHora(json.get("data_hora").asString());
+            dto.setUptime(json.get("uptime").asString());
+            dto.setSensorIp(json.get("sensor_ip").asString());
+            dto.setRssi(json.get("rssi").asInt());
 
-			dto.setTemperaturaFahrenheit(
-					json.get("temperatura_fahrenheit").asDouble()
-			);
+            SensorData entity = new SensorData();
 
-			dto.setUmidade(
-					json.get("umidade").asDouble()
-			);
+            entity.setTemperaturaCelsius(dto.getTemperaturaCelsius());
+            entity.setTemperaturaFahrenheit(dto.getTemperaturaFahrenheit());
+            entity.setUmidade(dto.getUmidade());
+            entity.setDataHora(Timestamp.valueOf(dto.getDataHora()));
+            entity.setUptime(dto.getUptime());
+            entity.setSensorIp(dto.getSensorIp());
+            entity.setRssi(dto.getRssi());
 
-			dto.setDataHora(
-					json.get("data_hora").asText()
-			);
+            repository.save(entity);
 
-			dto.setUptime(
-					json.get("uptime").asText()
-			);
+            System.out.println("✅ DATA SAVED IN DATABASE");
 
-			dto.setSensorIp(
-					json.get("sensor_ip").asText()
-			);
-
-			dto.setRssi(
-					json.get("rssi").asInt()
-			);
-
-			SensorData entity = new SensorData();
-
-			entity.setTemperaturaCelsius(dto.getTemperaturaCelsius());
-			entity.setTemperaturaFahrenheit(dto.getTemperaturaFahrenheit());
-			entity.setUmidade(dto.getUmidade());
-
-			entity.setDataHora(
-					Timestamp.valueOf(dto.getDataHora())
-			);
-
-			entity.setUptime(dto.getUptime());
-			entity.setSensorIp(dto.getSensorIp());
-			entity.setRssi(dto.getRssi());
-
-			repository.save(entity);
-
-			System.out.println("✅ DATA SAVED IN DATABASE");
-			System.out.println();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

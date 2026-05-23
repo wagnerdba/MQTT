@@ -17,6 +17,7 @@ public class MqttListener {
 	@ServiceActivator(inputChannel = "mqttInputChannel")
 	public void receive(Message<?> message) {
 
+		System.out.println();
 		System.out.println("🔍 MQTT RECEIVED - TOPIC: " + message.getHeaders().get("mqtt_receivedTopic"));
 		System.out.println("📥 PAYLOAD: " + message.getPayload());
 

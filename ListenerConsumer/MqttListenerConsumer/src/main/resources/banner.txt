@@ -8,7 +8,7 @@
 ╔═══════════════════════════════════════════════════════════════╗
 ║               MESSAGE QUEUE TELEMETRY TRANSPORT               ║
 ║                                                               ║
-║  Spring Boot MQTT Listener Initialized                        ║
+║  Spring Boot MQTT Listener (Consumer) Initialized             ║
 ║  Real-time Messaging • IoT • ESP32 • Sensors                  ║
 ║  Java ${java.version} ${java.vendor}                               ║
 ║  Spring Boot ${spring-boot.version}                                            ║
