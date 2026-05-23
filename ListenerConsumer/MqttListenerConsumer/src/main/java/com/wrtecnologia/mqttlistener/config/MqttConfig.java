@@ -47,12 +47,7 @@ public class MqttConfig {
 	@Bean
 	public MessageProducer inbound(MqttPahoClientFactory mqttPahoClientFactory) {
 
-		MqttPahoMessageDrivenChannelAdapter adapter =
-				new MqttPahoMessageDrivenChannelAdapter(
-						clientId,
-						mqttPahoClientFactory,
-						topic
-				);
+		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(clientId, mqttPahoClientFactory, topic);
 
 		adapter.setCompletionTimeout(5000);
 		adapter.setQos(1);

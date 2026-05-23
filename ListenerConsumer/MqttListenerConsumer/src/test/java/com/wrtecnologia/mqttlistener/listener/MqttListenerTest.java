@@ -1,5 +1,6 @@
 package com.wrtecnologia.mqttlistener.listener;
 
+import com.wrtecnologia.mqttlistener.service.SensorDataService;
 import org.junit.jupiter.api.Test;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
@@ -8,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class MqttListenerTest {
 
@@ -19,6 +21,7 @@ public class MqttListenerTest {
 		PrintStream customOut = new PrintStream(outputStream);
 
 		PrintStream tee = new PrintStream(System.out) {
+
 			@Override
 			public void println(String x) {
 				super.println(x);
@@ -32,19 +35,19 @@ public class MqttListenerTest {
 
 		try {
 
-			MqttListener listener = new MqttListener();
+			SensorDataService sensorDataService = mock(SensorDataService.class);
 
-			Message<String> message = MessageBuilder
-					.withPayload("TEST MESSAGE")
-					.setHeader("mqtt_receivedTopic", "test/topic")
-					.build();
+			MqttListener listener = new MqttListener(sensorDataService);
+
+			Message<String> message = MessageBuilder.withPayload("TEST MESSAGE").setHeader("mqtt_receivedTopic", "test/topic").build();
 
 			listener.receive(message);
 
 			String output = outputStream.toString();
 
-			assertTrue(output.contains("📥 MQTT RECEIVED - TOPIC: test/topic"));
-			assertTrue(output.contains("PAYLOAD:TEST MESSAGE"));
+			assertTrue(output.contains("🔍 MQTT RECEIVED - TOPIC: test/topic"));
+
+			assertTrue(output.contains("📥 PAYLOAD: TEST MESSAGE"));
 
 		} finally {
 			System.setOut(originalOut);

@@ -215,10 +215,18 @@ void loop() {
     connectWiFi();
 
   // MQTT
+  /*
   if (!client.connected())
   reconnectMQTT();
+  */
 
+  if (!client.connected()) {
+  reconnectMQTT();
+  } else {
   client.loop();
+}
+
+  // client.loop();
 
   delay(200);
 
@@ -640,6 +648,7 @@ void connectWiFi() {
 // -------------------
 // MQTT reconnect
 // -------------------
+/*
 void reconnectMQTT() {
 
   while (!client.connected()) {
@@ -651,7 +660,7 @@ void reconnectMQTT() {
 
     if (client.connect(clientId.c_str())) {
 
-      Serial.println("✅ MQTT conectado ao broker: " + clientId);
+      Serial.println("✅ MQTT Producer conectado ao broker: " + clientId);
 
     } else {
 
@@ -662,10 +671,41 @@ void reconnectMQTT() {
     }
   }
 }
+*/
+// -------------------
+// MQTT reconnect NÃO BLOQUEANTE
+// -------------------
+void reconnectMQTT() {
+
+  static unsigned long lastAttempt = 0;
+
+  // tenta apenas a cada 5 segundos
+  if (millis() - lastAttempt < 10000)
+    return;
+
+  lastAttempt = millis();
+
+  Serial.println("📡 Tentando conectar ao MQTT...");
+
+  String clientId = "ESP32-SHT45-";
+  clientId += String(random(0xffff), HEX);
+
+  if (client.connect(clientId.c_str())) {
+
+    Serial.println("✅ MQTT conectado: " + clientId);
+
+  } else {
+
+    Serial.print("❌ Conexão MQTT perdida rc=");
+    Serial.println(client.state());
+
+  }
+}
 
 // -------------------
 // Publish MQTT
 // -------------------
+/*
 void publishSensorData() {
 
   float temperatureCelsius, temperatureFahrenheit, humidity;
@@ -699,5 +739,52 @@ void publishSensorData() {
     for (int i = 0; i < 200; i++) Serial.print('-'); Serial.println();
     Serial.print("📤 MQTT SENT: "); Serial.println(jsonString);
     for (int i = 0; i < 200; i++) Serial.print('-'); Serial.println(); 
+  }
+}
+*/
+void publishSensorData() {
+
+  if (!client.connected()) {
+    Serial.println("⚠ MQTT desconectado. Publish ignorado.");
+    return;
+  }
+
+  float temperatureCelsius, temperatureFahrenheit, humidity;
+
+  if (tryReadSensor(temperatureCelsius, temperatureFahrenheit, humidity, true)) {
+
+    String dateTime = getCurrentDateTime();
+    String upTime = getUptime();
+    String sensorIp = WiFi.localIP().toString();
+    String sensorRssi = String(WiFi.RSSI());
+
+    StaticJsonDocument<256> jsonDoc;
+
+    jsonDoc["temperatura_celsius"] = temperatureCelsius;
+    jsonDoc["temperatura_fahrenheit"] = temperatureFahrenheit;
+    jsonDoc["umidade"] = humidity;
+    jsonDoc["data_hora"] = dateTime;
+    jsonDoc["uptime"] = upTime;
+    jsonDoc["sensor_ip"] = sensorIp;
+    jsonDoc["rssi"] = sensorRssi;
+
+    String jsonString;
+
+    serializeJson(jsonDoc, jsonString);
+
+    client.publish(
+      "sensores/esp32/sht45",
+      jsonString.c_str()
+    );
+
+   if (!client.connected()) {
+      Serial.println("⚠ MQTT desconectado. Publish ignorado.");
+      return;
+   }
+
+   for (int i = 0; i < 200; i++) Serial.print('-'); Serial.println();
+   Serial.print("📤 MQTT SENT: "); Serial.println(jsonString);
+   for (int i = 0; i < 200; i++) Serial.print('-'); Serial.println();
+
   }
 }
